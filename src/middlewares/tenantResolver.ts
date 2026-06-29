@@ -4,10 +4,6 @@ import { pool } from "../config/db";
 import { redis } from "../config/redis";
 
 const DOMAIN_CACHE_TTL = 60;
-
-// ⚠️ BELUM PASTI — sesuaikan dengan schema.prisma kamu yang sebenarnya.
-// Saya asumsikan tabel "Domain" (nama default Prisma untuk model `Domain`)
-// dan nilai enum status "ACTIVE" (uppercase). Lihat catatan di bawah.
 const QUERY = `
   SELECT id, company_id, hostname, type, target_origin
   FROM "Domain"
@@ -20,7 +16,10 @@ export async function tenantResolverMiddleware(
   res: Response,
   next: NextFunction,
 ) {
-  const hostname = (req.headers.host ?? "").toLowerCase().trim().split(":")[0];
+  const hostname = ((req.headers["x-original-host"] as string) ?? "")
+    .toLowerCase()
+    .trim()
+    .split(":")[0];
   const cacheKey = `domain:${hostname}`;
 
   try {
@@ -42,7 +41,7 @@ export async function tenantResolverMiddleware(
 
     if (!domain) {
       return res
-        .status(404)
+        .status(403)
         .json({ message: "Domain not registered or inactive" });
     }
 
