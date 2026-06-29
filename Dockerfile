@@ -10,4 +10,4 @@ COPY . .
 ENV NODE_ENV=production
 EXPOSE 4000
 
-CMD ["bun", "src/server.ts"]
+CMD ["bun", "server.ts"]
