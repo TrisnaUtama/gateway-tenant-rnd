@@ -40,6 +40,7 @@ export async function tenantResolverMiddleware(
     }
 
     if (!domain) {
+      res.set("X-Debug-Hostname", hostname || "(empty)");
       return res
         .status(403)
         .json({ message: "Domain not registered or inactive" });
